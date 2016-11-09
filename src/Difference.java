@@ -20,11 +20,11 @@ public class Difference {
 	}
 
 	public void calcDifference() {
-		putInMapNodes(graph1, true);
-		putInMapNodes(graph2, false);
+		putInMapNodesG1(graph1);
+		putInMapNodesG2(graph2);
 
-		putInMapEdges(graph1, true);
-		putInMapEdges(graph2, false);
+		putInMapEdgesG1(graph1);
+		putInMapEdgesG2(graph2);
 	}
 
 	public static void main(String[] args) {
@@ -64,52 +64,51 @@ public class Difference {
 		Graph difference = diff.calcAdjacency();
 		difference.printDiffGraph();
 	}
-
-	// Part 1 of algorithm
-	private void putInMapNodes(final Graph graph, final boolean graph1) {
-		if (graph1) {
-			for (int i = 0; i < graph.getNodeLabels().size(); i++) {
-				nodes.put(graph.getLabel(i), new Comparision(true, false));
-			}
-		} else {
-			for (int i = 0; i < graph.getNodeLabels().size(); i++) {
-				if (!nodes.containsKey(graph.getLabel(i))) {
-					nodes.put(graph.getLabel(i), new Comparision(false, true));
-				} else {
-					nodes.get(graph.getLabel(i)).setG2(true);
-				}
+	
+	private void putInMapNodesG1(final Graph graph) {
+		for (int i = 0; i < graph.getNodeLabels().size(); i++) {
+			nodes.put(graph.getLabel(i), new Comparision(true, false));
+		}
+	}
+	
+	private void putInMapNodesG2(final Graph graph) {
+		for (int i = 0; i < graph.getNodeLabels().size(); i++) {
+			if (!nodes.containsKey(graph.getLabel(i))) {
+				nodes.put(graph.getLabel(i), new Comparision(false, true));
+			} else {
+				nodes.get(graph.getLabel(i)).setG2(true);
 			}
 		}
 	}
-
-	private void putInMapEdges(final Graph graph, final boolean graph1) {
+	
+	private void putInMapEdgesG1(final Graph graph) {
 		boolean[][] adjacency = graph.getAdjacency();
-
-		if (graph1) {
-			for (int row = 0; row < adjacency.length; row++) {
-				for (int col = 0; col < adjacency.length; col++) {
-					if (adjacency[row][col]) {
-						edges.put(graph.getLabel(row).concat(DELIMITER).concat(graph.getLabel(col)),
-								new Comparision(true, false));
-					}
-				}
-			}
-		} else {
-			for (int row = 0; row < adjacency.length; row++) {
-				for (int col = 0; col < adjacency.length; col++) {
-					if (adjacency[row][col]) {
-						String tmp = graph.getLabel(row).concat(DELIMITER).concat(graph.getLabel(col));
-						if (!edges.containsKey(tmp)) {
-							edges.put(tmp, new Comparision(false, true));
-						} else {
-							edges.get(tmp).setG2(true);
-						}
-					}
+		
+		for (int row = 0; row < adjacency.length; row++) {
+			for (int col = 0; col < adjacency.length; col++) {
+				if (adjacency[row][col]) {
+					edges.put(graph.getLabel(row).concat(DELIMITER).concat(graph.getLabel(col)),
+							new Comparision(true, false));
 				}
 			}
 		}
 	}
 
+	private void putInMapEdgesG2(final Graph graph) {
+		boolean[][] adjacency = graph.getAdjacency();
+		for (int row = 0; row < adjacency.length; row++) {
+			for (int col = 0; col < adjacency.length; col++) {
+				if (adjacency[row][col]) {
+					String tmp = graph.getLabel(row).concat(DELIMITER).concat(graph.getLabel(col));
+					if (!edges.containsKey(tmp)) {
+						edges.put(tmp, new Comparision(false, true));
+					} else {
+						edges.get(tmp).setG2(true);
+					}
+				}
+			}
+		}
+	}
 	public Graph calcAdjacency() {
 		int size = nodes.size();
 		int[][] adjacency = new int[size][size];
@@ -135,7 +134,7 @@ public class Difference {
 
 		for (int i = 0; i < e.size(); i++) {
 			c = this.edges.get(e.get(i));
-			startAndEndNode = e.get(i).split("\\-->");
+			startAndEndNode = e.get(i).split("\\" + DELIMITER);
 			int fst = map.get(startAndEndNode[0]);
 			int snd = map.get(startAndEndNode[1]);
 			if (!c.isInG1() && c.isInG2()) {
