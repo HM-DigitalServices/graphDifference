@@ -23,7 +23,4 @@ public class Comparision {
 	public void setG2(final boolean containsInG2) {
 		this.containsInG2 = containsInG2;
 	}
-	
-	public void test(final boolean blub) {
-	}
 }
