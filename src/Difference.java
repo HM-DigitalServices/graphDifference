@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 
 public class Difference {
@@ -10,6 +11,9 @@ public class Difference {
 
 	private Hashtable<String, Comparision> nodes = new Hashtable<String, Comparision>();
 	private Hashtable<String, Comparision> edges = new Hashtable<String, Comparision>();
+	
+	private Hashtable<String, Comparision> nodes_common = new Hashtable<String, Comparision>();
+	private Hashtable<String, Comparision> edges_common = new Hashtable<String, Comparision>();
 
 	private Graph graph1;
 	private Graph graph2;
@@ -25,6 +29,52 @@ public class Difference {
 
 		putInMapEdgesG1(graph1);
 		putInMapEdgesG2(graph2);
+	}
+	
+	public void identifyCommonNodes() {
+		Iterator<Map.Entry<String, Comparision>> it = nodes.entrySet().iterator();
+
+		while (it.hasNext()) {
+		  Map.Entry<String, Comparision> node = it.next();
+		  if(node.getValue().isInG1() && node.getValue().isInG2()) {
+			  nodes_common.put(node.getKey(), node.getValue());
+		  }
+		  
+		  if (node.getKey() == null || node.getKey() == "") {
+		    it.remove();
+		  }
+		}
+	}
+	
+	public void identifyCommonEdges() {
+		Iterator<Map.Entry<String, Comparision>> it = edges.entrySet().iterator();
+
+		while (it.hasNext()) {
+		  Map.Entry<String, Comparision> edge = it.next();
+		  if(edge.getValue().isInG1() && edge.getValue().isInG2()) {
+			  edges_common.put(edge.getKey(), edge.getValue());
+		  }
+		  
+		  if (edge.getKey() == null || edge.getKey() == "") {
+		    it.remove();
+		  }
+		}
+	}
+	
+	public double calcSimilarity() {
+		double similarityNodes = nodes_common.size()/(1+nodes.size());
+		double similarityEdges = edges_common.size()/(1+edges.size());
+		
+		return (similarityNodes+similarityEdges)/(nodes.size()+edges.size());
+	}
+	
+	public boolean isAnomalyLikeSubgraph(double similarity, double minA_prob) {
+		if(similarity >= minA_prob) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	public static void main(String[] args) {
@@ -49,7 +99,7 @@ public class Difference {
 		Difference diff = new Difference(g1, g2);
 		diff.calcDifference();
 
-		Hashtable<String, Comparision> nodes = new Hashtable<String, Comparision>(diff.getNodes());
+		/*Hashtable<String, Comparision> nodes = new Hashtable<String, Comparision>(diff.getNodes());
 		Hashtable<String, Comparision> edges = new Hashtable<String, Comparision>(diff.getEdges());
 
 		for (String key : nodes.keySet()) {
@@ -60,8 +110,15 @@ public class Difference {
 		for (String key : edges.keySet()) {
 			System.out.println("Edge " + key + " in Graph1: " + edges.get(key).isInG1() + "; in Graph2: "
 					+ edges.get(key).isInG2());
-		}
+		}*/
+		
 		Graph difference = diff.calcAdjacency();
+		diff.identifyCommonNodes();
+		diff.identifyCommonEdges();
+		double similarity = diff.calcSimilarity();
+		
+		boolean ALS = diff.isAnomalyLikeSubgraph(similarity, 0.8);
+		
 		difference.printDiffGraph();
 	}
 	
