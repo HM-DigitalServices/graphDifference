@@ -48,6 +48,13 @@ public class ImportDataInNeo4j {
 			tx.success();
 		}
 	}
+	
+	private void createVM(GraphDatabaseService x, int counter) {
+		Node vm = x.createNode(Node.VM);
+		vm.setProperty("Name", "vm".concat(counter));
+		vm.createRelationshipTo()
+		x.
+	}
 
 	private void createGraph(GraphDatabaseService x) {
 		Node a = x.createNode(Sports.RUNNING);
