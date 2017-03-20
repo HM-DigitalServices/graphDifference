@@ -54,7 +54,7 @@ public class ImportDataInNeo4j {
 		StringBuffer sB = new StringBuffer();
 		sB.append("vm");
 		vm.setProperty("Name", sB.append(counter).toString());
-//		vm.createRelationshipTo(otherNode, type);
+		x.findNodes(NodeLabel.VM);
 		
 	}
 
