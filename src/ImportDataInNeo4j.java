@@ -23,12 +23,12 @@ public class ImportDataInNeo4j {
 	private Map<Integer, String> nodeLabels = new HashMap<Integer, String>();
 	private static boolean[][] adjacency;
 
-	private enum Sports implements Label {
-		RUNNING, SWIMMING, BIKING;
+	private enum Node implements Label {
+		VM, Server, RAM, OS, Manufacturer, Harddisk, Software, CPU, License, Service;
 	}
 
-	private enum RelationSport implements RelationshipType {
-		LOW, MIDDLE, HIGH, VERY_HIGH;
+	private enum Relation implements RelationshipType {
+		runs, in, produces, requires, depends;
 	}
 	
 	public ImportDataInNeo4j() {
