@@ -23,12 +23,12 @@ public class ImportDataInNeo4j {
 	private Map<Integer, String> nodeLabels = new HashMap<Integer, String>();
 	private static boolean[][] adjacency;
 
-	private enum Node implements Label {
-		VM, Server, RAM, OS, Manufacturer, Harddisk, Software, CPU, License, Service;
+	private enum NodeLabel implements Label {
+		VM, SERVER, RAM, OS, MANUFACTURER, HARDDISK, SOFTWARE, CPU, LICENCE, SERVICE;
 	}
 
-	private enum Relation implements RelationshipType {
-		runs, in, produces, requires, depends;
+	private enum RelationLabel implements RelationshipType {
+		RUNS, IN, PROCUDES, REQUIRES, DEPENDS;
 	}
 	
 	public ImportDataInNeo4j() {
@@ -50,17 +50,19 @@ public class ImportDataInNeo4j {
 	}
 	
 	private void createVM(GraphDatabaseService x, int counter) {
-		Node vm = x.createNode(Node.VM);
-		vm.setProperty("Name", "vm".concat(counter));
-		vm.createRelationshipTo()
-		x.
+		Node vm = x.createNode(NodeLabel.VM);
+		StringBuffer sB = new StringBuffer();
+		sB.append("vm");
+		vm.setProperty("Name", sB.append(counter).toString());
+//		vm.createRelationshipTo(otherNode, type);
+		
 	}
 
 	private void createGraph(GraphDatabaseService x) {
-		Node a = x.createNode(Sports.RUNNING);
-		Node b = x.createNode(Sports.BIKING);
-		Node c = x.createNode(Sports.SWIMMING);
-		Node dd = x.createNode(Sports.RUNNING);
+		Node a = x.createNode(NodeLabel.VM);
+		Node b = x.createNode(NodeLabel.SERVER);
+		Node c = x.createNode(NodeLabel.OS);
+		Node dd = x.createNode(NodeLabel.RAM);
 
 		a.setProperty("Track", "one");
 		a.setProperty("Kind of", "Competition");
@@ -71,9 +73,9 @@ public class ImportDataInNeo4j {
 		dd.setProperty("Track", "five");
 		dd.setProperty("Kind of", "intervall");
 
-		a.createRelationshipTo(b, RelationSport.MIDDLE);
-		b.createRelationshipTo(c, RelationSport.HIGH);
-		c.createRelationshipTo(a, RelationSport.VERY_HIGH);
+		a.createRelationshipTo(b, RelationLabel.IN);
+		b.createRelationshipTo(c, RelationLabel.REQUIRES);
+		c.createRelationshipTo(a, RelationLabel.DEPENDS);
 	}
 
 	// Annahme n.getId() startet immer bei "index"=0
