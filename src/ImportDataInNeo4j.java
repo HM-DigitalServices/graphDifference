@@ -30,32 +30,50 @@ public class ImportDataInNeo4j {
 	private enum RelationLabel implements RelationshipType {
 		RUNS, IN, PROCUDES, REQUIRES, DEPENDS;
 	}
-	
+
 	public ImportDataInNeo4j() {
 	}
 
 	public static void main(String[] args) {
 		ImportDataInNeo4j obj = new ImportDataInNeo4j();
-		
+
 		GraphDatabaseBuilder d = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_PATH));
 		GraphDatabaseService x = d.newGraphDatabase();
-		
+
 		try (Transaction tx = x.beginTx()) {
 			obj.createGraph(x);
 			obj.createAdjacency(x);
 			obj.printAdjacency();
-
+			obj.createNodes(x, obj);
+			
 			tx.success();
 		}
 	}
 	
-	private void createVM(GraphDatabaseService x, int counter) {
-		Node vm = x.createNode(NodeLabel.VM);
+	private void createNodes(GraphDatabaseService x, ImportDataInNeo4j obj) {
+		int nodeSize = 1000;
+		for (int i = 0; i < nodeSize; i++) {
+			obj.createNode(x, i, NodeLabel.LICENCE);
+			obj.createNode(x, i, NodeLabel.VM);
+			obj.createNode(x, i, NodeLabel.SERVICE);
+			obj.createNode(x, i, NodeLabel.RAM);
+			obj.createNode(x, i, NodeLabel.CPU);
+			obj.createNode(x, i, NodeLabel.SOFTWARE);
+			obj.createNode(x, i, NodeLabel.OS);
+			obj.createNode(x, i, NodeLabel.HARDDISK);
+			obj.createNode(x, i, NodeLabel.MANUFACTURER);
+		}
+		for (int i = 0; i < 100; i++) {
+			obj.createNode(x, i, NodeLabel.SERVER);
+		}
+	}
+
+	private void createNode(GraphDatabaseService x, int counter, NodeLabel nL) {
+		Node node = x.createNode(nL);
 		StringBuffer sB = new StringBuffer();
-		sB.append("vm");
-		vm.setProperty("Name", sB.append(counter).toString());
-		x.findNodes(NodeLabel.VM);
-		
+
+		sB.append(nL.toString());
+		node.setProperty("Name", sB.append(counter).toString());
 	}
 
 	private void createGraph(GraphDatabaseService x) {
@@ -99,7 +117,7 @@ public class ImportDataInNeo4j {
 			}
 		}
 	}
-	
+
 	public Graph getAdjacency() {
 		return new Graph(adjacency, nodeLabels);
 	}
@@ -112,21 +130,21 @@ public class ImportDataInNeo4j {
 		for (int i = 0; i < fieldWidth; i++) {
 			System.out.print(" ");
 		}
-		
+
 		for (int i = 0; i < nodeLabels.size(); i++) {
 			System.out.printf(formatS, nodeLabels.get(i));
 		}
 		System.out.println("|");
-		
+
 		for (int i = 0; i < adjacency.length; i++) {
 			System.out.printf(formatS, nodeLabels.get(i));
 			for (int k = 0; k < adjacency[i].length; k++) {
-				if(adjacency[i][k])
+				if (adjacency[i][k])
 					System.out.printf(formatB, adjacency[i][k]);
 				else
 					System.out.printf(formatB, adjacency[i][k]);
 			}
 			System.out.println("|");
 		}
-	}	
+	}
 }
