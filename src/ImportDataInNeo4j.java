@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
@@ -65,6 +66,49 @@ public class ImportDataInNeo4j {
 		sB.append(nL.toString());
 		node.setProperty("Name", sB.append(counter).toString());
 	}
+	
+	public void createRelationship(Node startNode, GraphDatabaseService x) {
+		Iterable<Label> iter = startNode.getLabels();
+		Iterator<Label> it = iter.iterator();
+		Label label = it.next();
+		NodeHandler nodeHandler = new NodeHandler();
+		
+		if(NodeLabel.SERVER == label || NodeLabel.LICENCE == label) {
+			
+		}
+		else if(NodeLabel.VM == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
+		}
+		else if(NodeLabel.SERVICE == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.DEPENDS);
+		}
+		else if(NodeLabel.RAM == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.IN);
+		}
+		else if(NodeLabel.CPU == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.IN);
+		}
+		else if(NodeLabel.SOFTWARE == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.OS), RelationLabel.RUNS);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.REQUIRES);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.LICENCE), RelationLabel.REQUIRES);
+		}
+		else if(NodeLabel.OS == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
+		}
+		else if(NodeLabel.HARDDISK == label) {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.IN);
+		}
+		else {
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.PROCUDES);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.OS), RelationLabel.PROCUDES);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.PROCUDES);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.CPU), RelationLabel.PROCUDES);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.HARDDISK), RelationLabel.PROCUDES);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.RAM), RelationLabel.PROCUDES);
+		}
+	}
+	
 
 	private void createGraph(GraphDatabaseService x) {
 		Node a = x.createNode(NodeLabel.VM);

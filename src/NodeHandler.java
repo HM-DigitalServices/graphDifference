@@ -7,9 +7,6 @@ import org.neo4j.graphdb.ResourceIterator;
 
 public class NodeHandler {
 	
-	private void relateToRandomNode(Node node) {	
-	}
-	
 	private ArrayList<Node> getNodes(GraphDatabaseService x, NodeLabel nL) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
@@ -24,5 +21,11 @@ public class NodeHandler {
 	private Node getRandomNode(ArrayList<Node> nodes) {
 		int randomInt = ThreadLocalRandom.current().nextInt(0, nodes.size()+1);
 		return nodes.get(randomInt);
+	}
+	
+	public Node getSpecificRandomNode(GraphDatabaseService x, NodeLabel nL) {
+		ArrayList<Node> nodes = getNodes(x, nL);
+		
+		return getRandomNode(nodes);
 	}
 }
