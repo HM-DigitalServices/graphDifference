@@ -4,14 +4,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.Label;
 
 public class NodeHandler {
-	private enum NodeLabel implements Label {};
-	
-	public NodeHandler(enum NodeLabel) {
-		this.NodeLabel = NodeLabel;
-	}
 	
 	private void relateToRandomNode(Node node) {	
 	}

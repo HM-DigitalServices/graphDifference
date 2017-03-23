@@ -3,14 +3,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -23,14 +20,6 @@ public class ImportDataInNeo4j {
 	private final static String DELETE_ALL = "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r";
 	private Map<Integer, String> nodeLabels = new HashMap<Integer, String>();
 	private static boolean[][] adjacency;
-
-	private enum NodeLabel implements Label {
-		VM, SERVER, RAM, OS, MANUFACTURER, HARDDISK, SOFTWARE, CPU, LICENCE, SERVICE;
-	}
-
-	private enum RelationLabel implements RelationshipType {
-		RUNS, IN, PROCUDES, REQUIRES, DEPENDS;
-	}
 
 	public ImportDataInNeo4j() {
 	}
