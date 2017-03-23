@@ -19,7 +19,13 @@ public class NodeHandler {
 	}
 	
 	private Node getRandomNode(ArrayList<Node> nodes) {
-		int randomInt = ThreadLocalRandom.current().nextInt(0, nodes.size()+1);
+		int randomInt = ThreadLocalRandom.current().nextInt(0, nodes.size());
+		try {
+			nodes.get(randomInt);
+		}
+		catch (Exception e) {
+			System.out.println("Test... " + randomInt);
+		}
 		return nodes.get(randomInt);
 	}
 	

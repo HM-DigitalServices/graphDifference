@@ -2,6 +2,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.neo4j.graphdb.Direction;
@@ -32,74 +33,106 @@ public class ImportDataInNeo4j {
 		GraphDatabaseService x = d.newGraphDatabase();
 
 		try (Transaction tx = x.beginTx()) {
-			obj.createGraph(x);
-			obj.createAdjacency(x);
-			obj.printAdjacency();
-			obj.createNodes(x, obj);
-			
+			obj.initGraph(x, obj);
+			System.out.println("Successful...");
 			tx.success();
 		}
 	}
 	
-	private void createNodes(GraphDatabaseService x, ImportDataInNeo4j obj) {
-		int nodeSize = 1000;
+	private void initGraph(GraphDatabaseService x, ImportDataInNeo4j obj) {
+		int nodeSize = 100;
+		int serverSize = 10;
+		List<Node> nodes = new ArrayList<>();
 		for (int i = 0; i < nodeSize; i++) {
-			obj.createNode(x, i, NodeLabel.LICENCE);
-			obj.createNode(x, i, NodeLabel.VM);
-			obj.createNode(x, i, NodeLabel.SERVICE);
-			obj.createNode(x, i, NodeLabel.RAM);
-			obj.createNode(x, i, NodeLabel.CPU);
-			obj.createNode(x, i, NodeLabel.SOFTWARE);
-			obj.createNode(x, i, NodeLabel.OS);
-			obj.createNode(x, i, NodeLabel.HARDDISK);
-			obj.createNode(x, i, NodeLabel.MANUFACTURER);
+			nodes.add(obj.createNode(x, i, NodeLabel.LICENCE));
+			nodes.add(obj.createNode(x, i, NodeLabel.VM));
+			nodes.add(obj.createNode(x, i, NodeLabel.SERVICE));
+			nodes.add(obj.createNode(x, i, NodeLabel.RAM));
+			nodes.add(obj.createNode(x, i, NodeLabel.CPU));
+			nodes.add(obj.createNode(x, i, NodeLabel.SOFTWARE));
+			nodes.add(obj.createNode(x, i, NodeLabel.OS));
+			nodes.add(obj.createNode(x, i, NodeLabel.HARDDISK));
+			nodes.add(obj.createNode(x, i, NodeLabel.MANUFACTURER));
 		}
-		for (int i = 0; i < 100; i++) {
-			obj.createNode(x, i, NodeLabel.SERVER);
+		
+		for (int i = 0; i < serverSize; i++) {
+			nodes.add(obj.createNode(x, i, NodeLabel.SERVER));
+		}
+		for(int i = 0; i < nodeSize * 9; i++) {
+			createRelationship(nodes.get(i), x);
+		}
+		for(int i = nodeSize * 9; i < nodeSize * 9 + serverSize; i++) {
+			createRelationship(nodes.get(i), x);
 		}
 	}
+	
+	public void addNode(GraphDatabaseService x, int counter, NodeLabel nL) {
+		Node node = createNode(x, counter, nL);
+		createRelationship(node, x);
+	}
 
-	private void createNode(GraphDatabaseService x, int counter, NodeLabel nL) {
+	private Node createNode(GraphDatabaseService x, int counter, NodeLabel nL) {
 		Node node = x.createNode(nL);
 		StringBuffer sB = new StringBuffer();
 
 		sB.append(nL.toString());
 		node.setProperty("Name", sB.append(counter).toString());
+	
+		return node;
 	}
 	
-	public void createRelationship(Node startNode, GraphDatabaseService x) {
+	private void createRelationship(Node startNode, GraphDatabaseService x) {
+		
 		Iterable<Label> iter = startNode.getLabels();
 		Iterator<Label> it = iter.iterator();
 		Label label = it.next();
+
 		NodeHandler nodeHandler = new NodeHandler();
 		
-		if(NodeLabel.SERVER == label || NodeLabel.LICENCE == label) {
-			
+		if(NodeLabel.SERVER.toString().equals(label.toString())) {
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.CPU).createRelationshipTo(startNode, RelationLabel.IN);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE).createRelationshipTo(startNode, RelationLabel.RUNS);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.OS).createRelationshipTo(startNode, RelationLabel.RUNS);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.MANUFACTURER).createRelationshipTo(startNode, RelationLabel.IN);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.RAM).createRelationshipTo(startNode, RelationLabel.PROCUDES);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.VM).createRelationshipTo(startNode, RelationLabel.RUNS);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.HARDDISK).createRelationshipTo(startNode, RelationLabel.IN);
 		}
-		else if(NodeLabel.VM == label) {
-			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
+		else if(NodeLabel.LICENCE.toString().equals(label.toString())) {
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE).createRelationshipTo(startNode, RelationLabel.REQUIRES);
 		}
-		else if(NodeLabel.SERVICE == label) {
+		else if(NodeLabel.VM.toString().equals(label.toString())) {
+			Relationship r = startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
+		}
+		else if(NodeLabel.SERVICE.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.DEPENDS);
 		}
-		else if(NodeLabel.RAM == label) {
+		else if(NodeLabel.RAM.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.IN);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.MANUFACTURER).createRelationshipTo(startNode, RelationLabel.PROCUDES);
 		}
-		else if(NodeLabel.CPU == label) {
+		else if(NodeLabel.CPU.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.IN);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.MANUFACTURER).createRelationshipTo(startNode, RelationLabel.PROCUDES);
 		}
-		else if(NodeLabel.SOFTWARE == label) {
+		else if(NodeLabel.SOFTWARE.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.OS), RelationLabel.RUNS);
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.REQUIRES);
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.LICENCE), RelationLabel.REQUIRES);
-		}
-		else if(NodeLabel.OS == label) {
+			
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVICE).createRelationshipTo(startNode, RelationLabel.DEPENDS);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.MANUFACTURER).createRelationshipTo(startNode, RelationLabel.PROCUDES);
+		}	
+		else if(NodeLabel.OS.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE).createRelationshipTo(startNode, RelationLabel.RUNS);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.MANUFACTURER).createRelationshipTo(startNode, RelationLabel.PROCUDES);
 		}
-		else if(NodeLabel.HARDDISK == label) {
+		else if(NodeLabel.HARDDISK.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.IN);
+			nodeHandler.getSpecificRandomNode(x, NodeLabel.MANUFACTURER).createRelationshipTo(startNode, RelationLabel.PROCUDES);
 		}
-		else {
+		else { //MANUFACTURER
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.PROCUDES);
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.OS), RelationLabel.PROCUDES);
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.PROCUDES);
@@ -110,6 +143,7 @@ public class ImportDataInNeo4j {
 	}
 	
 
+	@SuppressWarnings("unused")
 	private void createGraph(GraphDatabaseService x) {
 		Node a = x.createNode(NodeLabel.VM);
 		Node b = x.createNode(NodeLabel.SERVER);
@@ -131,6 +165,7 @@ public class ImportDataInNeo4j {
 	}
 
 	// Annahme n.getId() startet immer bei "index"=0
+	@SuppressWarnings("unused")
 	private void createAdjacency(GraphDatabaseService x) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		ResourceIterator<Node> iter = x.getAllNodes().iterator();
@@ -156,6 +191,7 @@ public class ImportDataInNeo4j {
 		return new Graph(adjacency, nodeLabels);
 	}
 
+	@SuppressWarnings("unused")
 	private void printAdjacency() {
 		int fieldWidth = 10;
 		String formatS = "|%" + fieldWidth + "s";
