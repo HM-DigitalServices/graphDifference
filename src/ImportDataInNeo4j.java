@@ -16,7 +16,8 @@ import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class ImportDataInNeo4j {
-	private final static String DB_PATH = "C:/Users/moest/OneDrive/Dokumente/Neo4j/default.graphdb";
+//	private final static String DB_PATH = "C:/Users/moest/OneDrive/Dokumente/Neo4j/default.graphdb";
+	private final static String DB_PATH = "C:/Users/4D6F6573746C/Documents/Neo4j/default.graphdb";
 
 	@SuppressWarnings("unused")
 	private final static String DELETE_ALL = "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r";
