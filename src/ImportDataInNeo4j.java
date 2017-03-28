@@ -93,6 +93,9 @@ public class ImportDataInNeo4j {
 		
 		serverNode.delete();
 		assert validateDeleteNode(x, handler, id) : "Server-Node konnte nicht gelöscht werden...";
+		if(nodesToOldServerNode.size() == 0) {
+			System.out.println("fuck...");
+		}
 		
 		createRelationshipsToServer(x, handler, nodesToOldServerNode);
 	}
@@ -107,25 +110,26 @@ public class ImportDataInNeo4j {
 	
 	private RelationshipType getRelationshipType(Node node) {
 		String label = node.getLabels().iterator().next().name();
-		if(label.equals(NodeLabel.CPU)) {
+		
+		if(label.equals(NodeLabel.CPU.name())) {
 			return RelationLabel.IN;
 		}
-		else if(label.equals(NodeLabel.SOFTWARE)) {
+		else if(label.equals(NodeLabel.SOFTWARE.name())) {
 			return RelationLabel.RUNS;
 		}
-		else if(label.equals(NodeLabel.OS)) {
+		else if(label.equals(NodeLabel.OS.name())) {
 			return RelationLabel.RUNS;
 		}
-		else if(label.equals(NodeLabel.MANUFACTURER)) {
+		else if(label.equals(NodeLabel.MANUFACTURER.name())) {
 			return RelationLabel.IN;
 		}
-		else if(label.equals(NodeLabel.RAM)) {
+		else if(label.equals(NodeLabel.RAM.name())) {
 			return RelationLabel.PROCUDES;
 		}
-		else if(label.equals(NodeLabel.VM)) {
+		else if(label.equals(NodeLabel.VM.name())) {
 			return RelationLabel.RUNS;
 		}
-		else if(label.equals(NodeLabel.HARDDISK)) {
+		else if(label.equals(NodeLabel.HARDDISK.name())) {
 			return RelationLabel.IN;
 		}
 		return null;
