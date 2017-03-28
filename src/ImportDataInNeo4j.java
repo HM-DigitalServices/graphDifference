@@ -10,6 +10,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -31,11 +32,12 @@ public class ImportDataInNeo4j {
 		ImportDataInNeo4j obj = new ImportDataInNeo4j();
 
 		GraphDatabaseBuilder d = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_PATH));
-		GraphDatabaseService x = d.newGraphDatabase();
+		final GraphDatabaseService x = d.newGraphDatabase();
 
 		try (Transaction tx = x.beginTx()) {
 			obj.initGraph(x, obj);
 			System.out.println("Successful...");
+			obj.removeRandomServer(x);
 			tx.success();
 		}
 	}
@@ -72,6 +74,73 @@ public class ImportDataInNeo4j {
 		createRelationship(node, x);
 	}
 
+	public void removeRandomServer(GraphDatabaseService x) {
+		NodeHandler handler = new NodeHandler();
+		
+		Node serverNode = handler.getSpecificRandomNode(x, NodeLabel.SERVER);
+		Iterable<Relationship> relations = serverNode.getRelationships();
+		Iterator<Relationship> iter = relations.iterator();
+		
+		ArrayList<Node> nodesToOldServerNode = new ArrayList<>();
+		Relationship relationOld;
+		while(iter.hasNext()) {
+			relationOld = iter.next();
+			nodesToOldServerNode.add(relationOld.getNodes()[0]);
+			System.out.println("nodeToOldServer : " + relationOld.getNodes()[0].getId() + " " + relationOld.getNodes()[0].getLabels().iterator().next().name());
+			relationOld.delete();
+		}
+		long id = serverNode.getId();
+		
+		serverNode.delete();
+		assert validateDeleteNode(x, handler, id) : "Server-Node konnte nicht gelöscht werden...";
+		
+		createRelationshipsToServer(x, handler, nodesToOldServerNode);
+	}
+
+	private void createRelationshipsToServer(GraphDatabaseService x, NodeHandler handler,
+			ArrayList<Node> nodesToOldServerNode) {
+		Node newServerNode = handler.getSpecificRandomNode(x, NodeLabel.SERVER);
+		for(int i = 0; i < nodesToOldServerNode.size(); i++) {
+			nodesToOldServerNode.get(i).createRelationshipTo(newServerNode, getRelationshipType(nodesToOldServerNode.get(i)));
+		}
+	}
+	
+	private RelationshipType getRelationshipType(Node node) {
+		String label = node.getLabels().iterator().next().name();
+		if(label.equals(NodeLabel.CPU)) {
+			return RelationLabel.IN;
+		}
+		else if(label.equals(NodeLabel.SOFTWARE)) {
+			return RelationLabel.RUNS;
+		}
+		else if(label.equals(NodeLabel.OS)) {
+			return RelationLabel.RUNS;
+		}
+		else if(label.equals(NodeLabel.MANUFACTURER)) {
+			return RelationLabel.IN;
+		}
+		else if(label.equals(NodeLabel.RAM)) {
+			return RelationLabel.PROCUDES;
+		}
+		else if(label.equals(NodeLabel.VM)) {
+			return RelationLabel.RUNS;
+		}
+		else if(label.equals(NodeLabel.HARDDISK)) {
+			return RelationLabel.IN;
+		}
+		return null;
+	}
+
+	private boolean validateDeleteNode(GraphDatabaseService x, NodeHandler handler, long id) {
+		ArrayList<Node> nodes = handler.getNodes(x, NodeLabel.SERVER);
+		for(int i = 0; i < nodes.size(); i++) {
+			if(nodes.get(i).getId() == id) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	private Node createNode(GraphDatabaseService x, int counter, NodeLabel nL) {
 		Node node = x.createNode(nL);
 		StringBuffer sB = new StringBuffer();

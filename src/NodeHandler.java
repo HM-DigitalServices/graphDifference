@@ -7,7 +7,7 @@ import org.neo4j.graphdb.ResourceIterator;
 
 public class NodeHandler {
 	
-	private ArrayList<Node> getNodes(GraphDatabaseService x, NodeLabel nL) {
+	public ArrayList<Node> getNodes(GraphDatabaseService x, NodeLabel nL) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		
 		ResourceIterator<Node> resources = x.findNodes(nL);
