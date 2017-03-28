@@ -103,7 +103,7 @@ public class ImportDataInNeo4j {
 			nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE).createRelationshipTo(startNode, RelationLabel.REQUIRES);
 		}
 		else if(NodeLabel.VM.toString().equals(label.toString())) {
-			Relationship r = startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
+			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SERVER), RelationLabel.RUNS);
 		}
 		else if(NodeLabel.SERVICE.toString().equals(label.toString())) {
 			startNode.createRelationshipTo(nodeHandler.getSpecificRandomNode(x, NodeLabel.SOFTWARE), RelationLabel.DEPENDS);
