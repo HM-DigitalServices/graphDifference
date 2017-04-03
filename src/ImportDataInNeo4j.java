@@ -37,7 +37,7 @@ public class ImportDataInNeo4j {
 		try (Transaction tx = x.beginTx()) {
 			obj.initGraph(x, obj);
 			System.out.println("Successful...");
-			obj.removeRandomServer(x);
+			obj.removeRandomNode(x, NodeLabel.SERVER);
 			tx.success();
 		}
 	}
@@ -74,35 +74,30 @@ public class ImportDataInNeo4j {
 		createRelationship(node, x);
 	}
 
-	public void removeRandomServer(GraphDatabaseService x) {
+	public void removeRandomNode(GraphDatabaseService x, NodeLabel label) {
 		NodeHandler handler = new NodeHandler();
 		
-		Node serverNode = handler.getSpecificRandomNode(x, NodeLabel.SERVER);
-		Iterable<Relationship> relations = serverNode.getRelationships();
+		Node node = handler.getSpecificRandomNode(x, label);
+		Iterable<Relationship> relations = node.getRelationships();
 		Iterator<Relationship> iter = relations.iterator();
 		
-		ArrayList<Node> nodesToOldServerNode = new ArrayList<>();
+		ArrayList<Node> nodesToOldNode = new ArrayList<>();
 		Relationship relationOld;
 		while(iter.hasNext()) {
 			relationOld = iter.next();
-			nodesToOldServerNode.add(relationOld.getNodes()[0]);
-			System.out.println("nodeToOldServer : " + relationOld.getNodes()[0].getId() + " " + relationOld.getNodes()[0].getLabels().iterator().next().name());
+			nodesToOldNode.add(relationOld.getNodes()[0]);
 			relationOld.delete();
 		}
-		long id = serverNode.getId();
+		long id = node.getId();
 		
-		serverNode.delete();
+		node.delete();
 		assert validateDeleteNode(x, handler, id) : "Server-Node konnte nicht gelöscht werden...";
-		if(nodesToOldServerNode.size() == 0) {
-			System.out.println("fuck...");
-		}
 		
-		createRelationshipsToServer(x, handler, nodesToOldServerNode);
+		createRelationshipsToNode(x, handler, nodesToOldNode, label);
 	}
 
-	private void createRelationshipsToServer(GraphDatabaseService x, NodeHandler handler,
-			ArrayList<Node> nodesToOldServerNode) {
-		Node newServerNode = handler.getSpecificRandomNode(x, NodeLabel.SERVER);
+	private void createRelationshipsToNode(GraphDatabaseService x, NodeHandler handler, ArrayList<Node> nodesToOldServerNode, NodeLabel label) {
+		Node newServerNode = handler.getSpecificRandomNode(x, label);
 		for(int i = 0; i < nodesToOldServerNode.size(); i++) {
 			nodesToOldServerNode.get(i).createRelationshipTo(newServerNode, getRelationshipType(nodesToOldServerNode.get(i)));
 		}
