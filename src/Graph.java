@@ -1,10 +1,23 @@
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author  administrator
+ */
 public class Graph {
+	/**
+	 * @uml.property  name="nodeLabels"
+	 * @uml.associationEnd  qualifier="valueOf:java.lang.Integer java.lang.String"
+	 */
 	private Map<Integer, String> nodeLabels = new HashMap<Integer, String>();
 	
+	/**
+	 * @uml.property  name="adjacency"
+	 */
 	private boolean[][] adjacency;
+	/**
+	 * @uml.property  name="diff"
+	 */
 	private int[][] diff;
 	
 	public Graph(final boolean[][] adjacency, final Map<Integer, String> nodeLabels) {
@@ -30,6 +43,10 @@ public class Graph {
 		return nodeLabels.get(value);
 	}
 	
+	/**
+	 * @return
+	 * @uml.property  name="adjacency"
+	 */
 	public boolean[][] getAdjacency() {
 		return adjacency;
 	}

@@ -1,6 +1,17 @@
+/**
+ * @author  administrator
+ */
 public class Comparision {
 	
+	/**
+	 * @uml.property  name="containsInG1"
+	 * @uml.associationEnd  qualifier="this:Difference java.util.Hashtable"
+	 */
 	private boolean containsInG1;
+	/**
+	 * @uml.property  name="containsInG2"
+	 * @uml.associationEnd  qualifier="this:Difference java.util.Hashtable"
+	 */
 	private boolean containsInG2;
 
 	public Comparision(final boolean containsInG1, final boolean containsInG2) {

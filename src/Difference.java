@@ -5,17 +5,42 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * @author  administrator
+ */
 public class Difference {
 
 	private final static String DELIMITER = "-->";
 
+	/**
+	 * @uml.property  name="nodes"
+	 * @uml.associationEnd  qualifier="getLabel:java.lang.String Comparision"
+	 */
 	private Hashtable<String, Comparision> nodes = new Hashtable<String, Comparision>();
+	/**
+	 * @uml.property  name="edges"
+	 * @uml.associationEnd  qualifier="get:java.lang.String Comparision"
+	 */
 	private Hashtable<String, Comparision> edges = new Hashtable<String, Comparision>();
 
+	/**
+	 * @uml.property  name="nodes_common"
+	 */
 	private Hashtable<String, Comparision> nodes_common = new Hashtable<String, Comparision>();
+	/**
+	 * @uml.property  name="edges_common"
+	 */
 	private Hashtable<String, Comparision> edges_common = new Hashtable<String, Comparision>();
 
+	/**
+	 * @uml.property  name="graph1"
+	 * @uml.associationEnd  multiplicity="(1 1)"
+	 */
 	private Graph graph1;
+	/**
+	 * @uml.property  name="graph2"
+	 * @uml.associationEnd  multiplicity="(1 1)"
+	 */
 	private Graph graph2;
 
 	public Difference(final Graph graph1, final Graph graph2) {
