@@ -11,6 +11,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -50,7 +51,7 @@ public class ImportDataInNeo4j {
 	}
 	
 	private void initGraph(GraphDatabaseService x, ImportDataInNeo4j obj) {
-		int nodeSize = 100;
+		int nodeSize = 10;
 		int serverSize = 10;
 		List<Node> nodes = new ArrayList<>();
 		for (int i = 0; i < nodeSize; i++) {
@@ -73,6 +74,25 @@ public class ImportDataInNeo4j {
 		}
 		for(int i = nodeSize * 9; i < nodeSize * 9 + serverSize; i++) {
 			createRelationship(nodes.get(i), x);
+		}
+		
+		export(x);
+	}
+
+	private void export(GraphDatabaseService x) {
+		//createAdjacency...
+		ResourceIterable<Node> all = x.getAllNodes();
+		ResourceIterator<Node> iter = all.iterator();
+		int counterNodes = 0;
+		while(iter.hasNext()) {
+			counterNodes++;
+			iter.next();
+		}
+		boolean[][] adjacency = new boolean[counterNodes][counterNodes];
+		for(int i = 0; i < adjacency.length; i++) {
+			for(int k = 0; k < adjacency[i].length; k++) {
+				
+			}
 		}
 	}
 	
