@@ -22,7 +22,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
  */
 public class ImportDataInNeo4j {
 //	private final static String DB_PATH = "C:/Users/moest/OneDrive/Dokumente/Neo4j/default.graphdb";
-	private final static String DB_PATH = "C:/Users/4D6F6573746C/Documents/Neo4j/default.graphdb";
+	private static String DB_PATH;
 
 	@SuppressWarnings("unused")
 	private final static String DELETE_ALL = "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r";
@@ -34,6 +34,10 @@ public class ImportDataInNeo4j {
 	private static boolean[][] adjacency;
 
 	public ImportDataInNeo4j() {
+	}
+	
+	public ImportDataInNeo4j(String dbPath) {
+		this.DB_PATH = dbPath;
 	}
 
 	public static void main(String[] args) {
