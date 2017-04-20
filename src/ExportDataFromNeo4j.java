@@ -1,5 +1,6 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Set;
 
@@ -30,13 +31,14 @@ public class ExportDataFromNeo4j {
 		this.DB_PATH = path;
 	}
 	
-	public boolean[][] exportGraph() {
+	public Graph exportGraph() {
 		GraphDatabaseBuilder d = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_PATH));
 		final GraphDatabaseService x = d.newGraphDatabase();
 		
 		boolean[][] adjacency = exportAdjacency(x);
+		HashMap<Integer, String> nodeLabels = exportNodeLabels(x);
 		
-		return adjacency;
+		return new Graph(adjacency, nodeLabels);
 	}
 	
 	private boolean[][] exportAdjacency(GraphDatabaseService x) {
@@ -77,5 +79,20 @@ public class ExportDataFromNeo4j {
 		}
 		
 		return adjacency;
+	}
+	
+	private HashMap<Integer, String> exportNodeLabels(GraphDatabaseService x) {
+		ResourceIterable<Node> nodes = x.getAllNodes();
+		ResourceIterator<Node> nodesIter = nodes.iterator();
+		
+		HashMap<Integer, String> nodeLabels = new HashMap<Integer, String>();
+		int labelCounter = 0;
+		
+		while(nodesIter.hasNext()) {
+			Node n = nodesIter.next();
+			nodeLabels.put(++labelCounter, n.getLabels().iterator().next().toString());
+		}
+		
+		return nodeLabels;
 	}
 }
