@@ -23,17 +23,23 @@ public class ExportDataFromNeo4j {
 		this.DB_PATH = dbPath;
 	}
 	
-	public void exportGraph() {
-		GraphDatabaseBuilder d = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_PATH));
-		final GraphDatabaseService x = d.newGraphDatabase();
-
-		try (Transaction tx = x.beginTx()) {
-			tx.success();
-		}
-
+	public ExportDataFromNeo4j() {
 	}
 	
-	public boolean[][] exportAdjacency(GraphDatabaseService x) {
+	public void setDBPath(String path) {
+		this.DB_PATH = path;
+	}
+	
+	public boolean[][] exportGraph() {
+		GraphDatabaseBuilder d = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(DB_PATH));
+		final GraphDatabaseService x = d.newGraphDatabase();
+		
+		boolean[][] adjacency = exportAdjacency(x);
+		
+		return adjacency;
+	}
+	
+	private boolean[][] exportAdjacency(GraphDatabaseService x) {
 		ResourceIterable<Node> nodes = x.getAllNodes();
 		ResourceIterator<Node> nodesIter = nodes.iterator();
 		
