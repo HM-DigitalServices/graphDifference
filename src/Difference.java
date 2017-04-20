@@ -36,24 +36,24 @@ public class Difference {
 	 * @uml.property  name="graph1"
 	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
-	private Graph graph1;
+	private Graph cmdb;
 	/**
 	 * @uml.property  name="graph2"
 	 * @uml.associationEnd  multiplicity="(1 1)"
 	 */
-	private Graph graph2;
+	private Graph anomaly;
 
 	public Difference(final Graph graph1, final Graph graph2) {
-		this.graph1 = graph1;
-		this.graph2 = graph2;
+		this.cmdb = graph1;
+		this.anomaly = graph2;
 	}
 
 	public void calcDifference() {
-		putInMapNodesG1(graph1);
-		putInMapNodesG2(graph2);
+		putInMapNodesG1(cmdb);
+		putInMapNodesG2(anomaly);
 
-		putInMapEdgesG1(graph1);
-		putInMapEdgesG2(graph2);
+		putInMapEdgesG1(cmdb);
+		putInMapEdgesG2(anomaly);
 	}
 
 	public void identifyCommonNodes() {
