@@ -55,7 +55,7 @@ public class ExportDataFromNeo4j {
 		while(nodesIter.hasNext()) {
 			Node n = nodesIter.next();
 			nodesList.add(n);
-			nodesAmount++;
+			//nodesAmount++;
 		}
 		
 		boolean[][] adjacency = new boolean[nodesAmount][nodesAmount];
