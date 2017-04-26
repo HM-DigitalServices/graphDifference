@@ -12,10 +12,4 @@ public enum NodeLabel implements Label {
     public int getValue() {
         return value;
     }
-    
-    public static void main(String[] args) {
-		System.out.println(NodeLabel.RAM.getValue());
-		NodeLabel[] ar = NodeLabel.values();
-		System.out.println(ar[1] + "...");
-	}
 }

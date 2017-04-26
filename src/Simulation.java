@@ -34,15 +34,16 @@ public class Simulation {
 		ArrayList<Double> normalDistributedValues = calcNormalDistributedValues(0, 1, 50);
 	}
 	
-	private void simulateAdding(GraphDatabaseService x, ImportDataInNeo4j importer, double quantile, ArrayList<double> normalDistributedValues) {
+	private void simulateAdding(GraphDatabaseService x, ImportDataInNeo4j importer, double quantile, ArrayList<Double> normalDistributedValues) {
 		for(double normalDistributedValue : normalDistributedValues) {
-			if(normaldistributedValue < quantile) {
+			if(normalDistributedValue < quantile) {
 				importer.addNode(x, new NodeHandler().getNodes(x, NodeLabel.SERVER).size(), NodeLabel.SERVER);
 			}
 			
-			else {
-				
-				NodeLabel.valueOf(0);
+			else {				
+				Random r = new Random();
+				int randomNum = r.nextInt(10)+ 1;
+				importer.addNode(x, new NodeHandler().getNodes(x, NodeLabel.values()[randomNum]).size(), NodeLabel.values()[randomNum]);
 			}
 		}
 	}
