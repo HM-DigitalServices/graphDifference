@@ -1,7 +1,9 @@
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.neo4j.cypher.internal.compiler.v2_3.planner.logical.cardinality.triplet.calculateOverlapCardinality;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
@@ -22,19 +24,37 @@ public class Simulation {
 		}
 	}
 	
-	public static void calc() {
-		double pAddServer = 0.15;
-		double pRemoveServer = 1 - pAddServer;
+	public void simulate(double pAddServer, double pRemoveServer) {
+		double pAddElse = 1 - pAddServer;
+		double pRemoveElse = 1- pRemoveServer;
 		
-		Random r = new Random();
-		double val = r.nextGaussian(); //var = 2, x=10
-		int millisDelay = (int) Math.round(val);
-		NormalDistribution d = new NormalDistribution(10, 1);
+		NormalDistribution d = new NormalDistribution(0, 1);
+		double quantile = d.density(pAddServer);
 		
-		for(int i = 0; i < 100; i++) {
-			if(Math.random()*pAddServer > 2) {
+		ArrayList<Double> normalDistributedValues = calcNormalDistributedValues(0, 1, 50);
+	}
+	
+	private void simulateAdding(GraphDatabaseService x, ImportDataInNeo4j importer, double quantile, ArrayList<double> normalDistributedValues) {
+		for(double normalDistributedValue : normalDistributedValues) {
+			if(normaldistributedValue < quantile) {
+				importer.addNode(x, new NodeHandler().getNodes(x, NodeLabel.SERVER).size(), NodeLabel.SERVER);
+			}
+			
+			else {
 				
+				NodeLabel.valueOf(0);
 			}
 		}
+	}
+	
+	private ArrayList<Double> calcNormalDistributedValues(double mean, double std, int size) {
+		ArrayList<Double> normalDistributedValues = new ArrayList<Double>();
+		Random r = new Random();
+		
+		for(int i = 0; i < size; i++) {
+			normalDistributedValues.add(r.nextGaussian()*1);
+		}
+		
+		return normalDistributedValues;
 	}
 }
