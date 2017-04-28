@@ -31,6 +31,10 @@ public class Difference {
 	 * @uml.property  name="edges_common"
 	 */
 	private Hashtable<String, Comparision> edges_common = new Hashtable<String, Comparision>();
+	
+	private Hashtable<String, Comparision> nodes_different = new Hashtable<String, Comparision>();
+	
+	private Hashtable<String, Comparision> edges_different = new Hashtable<String, Comparision>();
 
 	/**
 	 * @uml.property  name="graph1"
@@ -70,6 +74,21 @@ public class Difference {
 			}
 		}
 	}
+	
+	public void identifyDifferentNodes() {
+		Iterator<Map.Entry<String, Comparision>> it = nodes.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, Comparision> node = it.next();
+			if((node.getValue().isInG1() && !node.getValue().isInG2()) || (node.getValue().isInG2() && !node.getValue().isInG1())) {
+				nodes_different.put(node.getKey(), node.getValue());
+			}
+			
+			if(node.getKey() == null || node.getKey() == "") {
+				it.remove();
+			}
+		}
+	}
 
 	public void identifyCommonEdges() {
 		Iterator<Map.Entry<String, Comparision>> it = edges.entrySet().iterator();
@@ -81,6 +100,21 @@ public class Difference {
 			}
 
 			if (edge.getKey() == null || edge.getKey() == "") {
+				it.remove();
+			}
+		}
+	}
+	
+	public void identifyDifferentEdges() {
+		Iterator<Map.Entry<String, Comparision>> it = edges.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, Comparision> edge = it.next();
+			if((edge.getValue().isInG1() && !edge.getValue().isInG2()) || (edge.getValue().isInG2() && !edge.getValue().isInG1())) {
+				edges_different.put(edge.getKey(), edge.getValue());
+			}
+			
+			if(edge.getKey() == null || edge.getKey() == "") {
 				it.remove();
 			}
 		}
@@ -99,51 +133,6 @@ public class Difference {
 		} else {
 			return false;
 		}
-	}
-
-	public static void main(String[] args) {
-		HashMap<Integer, String> h1 = new HashMap<>();
-		h1.put(0, "A");
-		h1.put(1, "B");
-		h1.put(2, "C");
-		h1.put(3, "D");
-		Graph g1 = new Graph(new boolean[][] { { false, false, false, true }, { true, false, false, false },
-				{ true, false, false, false }, { false, true, false, false } }, h1);
-
-		HashMap<Integer, String> h2 = new HashMap<>();
-		h2.put(0, "A");
-		h2.put(1, "D");
-		h2.put(2, "E");
-		h2.put(3, "F");
-		h2.put(4, "G");
-		Graph g2 = new Graph(new boolean[][] { { false, true, false, true, true }, { false, false, true, false, false },
-				{ false, false, false, false, true }, { false, false, false, false, false },
-				{ false, false, false, false, false } }, h2);
-
-		Difference diff = new Difference(g1, g2);
-		diff.calcDifference();
-
-		/*
-		 * Hashtable<String, Comparision> nodes = new Hashtable<String,
-		 * Comparision>(diff.getNodes()); Hashtable<String, Comparision> edges =
-		 * new Hashtable<String, Comparision>(diff.getEdges());
-		 * 
-		 * for (String key : nodes.keySet()) { System.out.println("Node " + key
-		 * + " in Graph1: " + nodes.get(key).isInG1() + "; in Graph2: " +
-		 * nodes.get(key).isInG2()); } System.out.println("----------------");
-		 * for (String key : edges.keySet()) { System.out.println("Edge " + key
-		 * + " in Graph1: " + edges.get(key).isInG1() + "; in Graph2: " +
-		 * edges.get(key).isInG2()); }
-		 */
-
-		Graph difference = diff.calcAdjacency();
-		diff.identifyCommonNodes();
-		diff.identifyCommonEdges();
-		double similarity = diff.calcSimilarity();
-
-		boolean ALS = diff.isAnomalyLikeSubgraph(similarity, 0.8);
-
-		difference.printDiffGraph();
 	}
 
 	private void putInMapNodesG1(final Graph graph) {
@@ -191,48 +180,27 @@ public class Difference {
 		}
 	}
 
-	public Graph calcAdjacency() {
-		int size = nodes.size();
-		int[][] adjacency = new int[size][size];
-
-		ArrayList<String> nodes = new ArrayList<>(this.nodes.keySet());
-		Collections.sort(nodes);
-
-		Map<String, Integer> map = new HashMap<>();
-		for (int i = 0; i < nodes.size(); i++) {
-			map.put(nodes.get(i), i);
-			// System.out.println(nodes.get(i) + " " + map.get(nodes.get(i)));
-		}
-
-		Map<Integer, String> map2 = new HashMap<>();
-		for (int i = 0; i < nodes.size(); i++) {
-			map2.put(i, nodes.get(i));
-		}
-
-		ArrayList<String> e = new ArrayList<>(this.edges.keySet());
-		Collections.sort(e);
-		Comparision c;
-		String[] startAndEndNode = new String[2];
-
-		for (int i = 0; i < e.size(); i++) {
-			c = this.edges.get(e.get(i));
-			startAndEndNode = e.get(i).split("\\" + DELIMITER);
-			int fst = map.get(startAndEndNode[0]);
-			int snd = map.get(startAndEndNode[1]);
-			if (!c.isInG1() && c.isInG2()) {
-				adjacency[fst][snd] = 1;
-			} else if (c.isInG1() && !c.isInG2()) {
-				adjacency[fst][snd] = -1;
-			}
-		}
-		return new Graph(adjacency, map2);
-	}
-
 	public Hashtable<String, Comparision> getNodes() {
 		return nodes;
 	}
 
 	public Hashtable<String, Comparision> getEdges() {
 		return edges;
+	}
+	
+	public Hashtable<String, Comparision> getCommonNodes() {
+		return nodes_common;
+	}
+	
+	public Hashtable<String, Comparision> getCommonEdges() {
+		return edges_common;
+	}
+	
+	public Hashtable<String, Comparision> getDifferentNodes() {
+		return nodes_different;
+	}
+	
+	public Hashtable<String, Comparision> getDifferentEdges() {
+		return edges_different;
 	}
 }
